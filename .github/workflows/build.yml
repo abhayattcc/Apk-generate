@@ -100,15 +100,29 @@ jobs:
           S_KPASS: ${{ secrets.KEY_PASSWORD }}
         run: |
           KS="$RUNNER_TEMP/release.jks"
+          [ -n "$S_PASS" ] && echo "::add-mask::$S_PASS"
+          [ -n "$S_KPASS" ] && echo "::add-mask::$S_KPASS"
+
           if [ -n "$KS_B64" ]; then
-            echo "Using keystore from repository secrets."
+            echo "Using existing keystore from KEYSTORE_BASE64."
             echo "$KS_B64" | base64 -d > "$KS"
             [ -z "$S_KPASS" ] && S_KPASS="$S_PASS"
+            [ -z "$S_ALIAS" ] && S_ALIAS="slither"
           else
-            echo "No keystore secrets found. Generating a NEW keystore."
-            S_PASS="$(openssl rand -hex 12)"
+            echo "No KEYSTORE_BASE64 found. Generating a new keystore."
+            [ -z "$S_ALIAS" ] && S_ALIAS="slither"
+            YOUR_OWN_PASSWORD=true
+            if [ -z "$S_PASS" ]; then
+              YOUR_OWN_PASSWORD=false
+              S_PASS="$(openssl rand -hex 12)"
+              echo "::add-mask::$S_PASS"
+            fi
+            if [ "${#S_PASS}" -lt 6 ]; then
+              echo "KEYSTORE_PASSWORD must be at least 6 characters."
+              exit 1
+            fi
+            # PKCS12 keystores need the key password to equal the store password
             S_KPASS="$S_PASS"
-            S_ALIAS="slither"
             keytool -genkeypair -v -keystore "$KS" -storetype PKCS12 \
               -alias "$S_ALIAS" -keyalg RSA -keysize 2048 -validity 10000 \
               -storepass "$S_PASS" -keypass "$S_KPASS" \
@@ -117,13 +131,17 @@ jobs:
             cp "$KS" keystore-out/release.jks
             {
               echo "storeFile=release.jks"
-              echo "storePassword=$S_PASS"
               echo "keyAlias=$S_ALIAS"
-              echo "keyPassword=$S_KPASS"
+              if [ "$YOUR_OWN_PASSWORD" = "true" ]; then
+                echo "storePassword=(the KEYSTORE_PASSWORD secret you set)"
+                echo "keyPassword=(same as storePassword)"
+              else
+                echo "storePassword=$S_PASS"
+                echo "keyPassword=$S_KPASS"
+              fi
             } > keystore-out/credentials.txt
           fi
-          echo "::add-mask::$S_PASS"
-          echo "::add-mask::$S_KPASS"
+
           {
             echo "KS_PATH=$KS"
             echo "KS_PASS=$S_PASS"
