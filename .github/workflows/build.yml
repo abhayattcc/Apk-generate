@@ -99,9 +99,19 @@ jobs:
           if not os.path.exists(os.path.join(java_dir, "DebugActivity.java")):
               t = re.sub(r'<activity\s+android:name="\.DebugActivity".*?/>', "", t, flags=re.S)
           open(m, "w", encoding="utf-8").write(t)
+
+          # ---- gradle.properties (rewrite cleanly, one setting per line) ----
+          gp = "gradle.properties"
+          lines = []
+          if os.path.exists(gp):
+              lines = open(gp, encoding="utf-8").read().replace("\r\n", "\n").split("\n")
+          lines = [l for l in lines if l.strip() and not l.startswith("org.gradle.jvmargs")]
+          lines.append("org.gradle.jvmargs=-Xmx3g -Dfile.encoding=UTF-8")
+          open(gp, "w", encoding="utf-8").write("\n".join(lines) + "\n")
           PY
 
-          echo "org.gradle.jvmargs=-Xmx3g -Dfile.encoding=UTF-8" >> gradle.properties
+          echo "---- gradle.properties ----"
+          cat gradle.properties
 
       - name: Prepare keystore
         env:
