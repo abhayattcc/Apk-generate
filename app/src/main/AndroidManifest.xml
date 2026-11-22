@@ -1,14 +1,11 @@
-
 <manifest
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.my.SlitherArena">
+	xmlns:android="http://schemas.android.com/apk/res/android">
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<application
 		android:allowBackup="true"
 		android:icon="@mipmap/ic_launcher"
 		android:label="@string/app_name"
-		android:name=".SketchApplication"
 		android:requestLegacyExternalStorage="true"
 		android:theme="@style/AppTheme">
 		<activity
@@ -23,10 +20,7 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		<activity
-			android:name=".DebugActivity"
-			android:screenOrientation="portrait"
-			android:theme="@style/AppTheme.DebugActivity" />
+
 <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID"
     android:value="ca-app-pub-3242350797621523~1881469909"/>
     <meta-data android:name="com.google.android.gms.version"
@@ -37,4 +31,4 @@
     android:exported="false"
     android:theme="@android:style/Theme.Translucent" />
 	</application>
-</manifest>
+</manifest>
