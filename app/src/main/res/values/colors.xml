@@ -1,0 +1,7 @@
+<resources>
+	<color name="colorPrimary">#A56A32</color>
+	<color name="colorPrimaryDark">#A56A32</color>
+	<color name="colorAccent">#A56A32</color>
+	<color name="colorControlHighlight">#FFDCC1</color>
+	<color name="colorControlNormal">#A56A32</color>
+</resources>

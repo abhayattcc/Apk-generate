@@ -1,0 +1,87 @@
+plugins {
+	id 'com.android.application'
+}
+
+android {
+	compileSdk 34
+	
+	defaultConfig {
+		applicationId "com.my.SlitherArena"
+		namespace "com.my.SlitherArena"
+		minSdkVersion 21
+		targetSdkVersion 36
+		versionCode 1
+		versionName "1.0"
+	}
+	
+	buildTypes {
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+		}
+	}
+	buildFeatures {
+		viewBinding true
+	}
+}
+
+dependencies {
+	implementation fileTree(dir: 'libs', include: ['*.jar'])
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+	implementation 'com.google.android.gms:play-services-ads:23.6.0'
+}
