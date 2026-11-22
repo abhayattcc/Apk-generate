@@ -37,8 +37,18 @@ jobs:
 
       - name: Install Android SDK platform 36
         run: |
-          yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager "platforms;android-36" "build-tools;36.0.0"
+          SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKM" ]; then
+            SDKM="$(find "$ANDROID_HOME" -name sdkmanager -type f 2>/dev/null | head -n 1)"
+          fi
+          if [ -n "$SDKM" ] && [ -x "$SDKM" ]; then
+            echo "Using sdkmanager at $SDKM"
+            yes | "$SDKM" --licenses > /dev/null || true
+            "$SDKM" "platforms;android-36" "build-tools;36.0.0" || true
+          else
+            echo "sdkmanager not found, relying on the preinstalled SDK."
+          fi
+          ls "$ANDROID_HOME/platforms" || true
 
       - name: Fix project files
         run: |
@@ -59,23 +69,24 @@ jobs:
 
           s = s.replace("compileSdk 34", "compileSdk 36")
 
-          signing = (
-              "android {\n"
-              "\tsigningConfigs {\n"
-              "\t\trelease {\n"
-              "\t\t\tstoreFile file(System.getenv('KS_PATH'))\n"
-              "\t\t\tstorePassword System.getenv('KS_PASS')\n"
-              "\t\t\tkeyAlias System.getenv('KS_ALIAS')\n"
-              "\t\t\tkeyPassword System.getenv('KEY_PASS')\n"
-              "\t\t}\n"
-              "\t}\n"
-          )
-          s = s.replace("android {", signing, 1)
-          s = re.sub(
-              r"(buildTypes\s*\{\s*release\s*\{)",
-              r"\1\n\t\t\tsigningConfig signingConfigs.release",
-              s, count=1,
-          )
+          if "signingConfigs" not in s:
+              signing = (
+                  "android {\n"
+                  "\tsigningConfigs {\n"
+                  "\t\trelease {\n"
+                  "\t\t\tstoreFile file(System.getenv('KS_PATH'))\n"
+                  "\t\t\tstorePassword System.getenv('KS_PASS')\n"
+                  "\t\t\tkeyAlias System.getenv('KS_ALIAS')\n"
+                  "\t\t\tkeyPassword System.getenv('KEY_PASS')\n"
+                  "\t\t}\n"
+                  "\t}\n"
+              )
+              s = s.replace("android {", signing, 1)
+              s = re.sub(
+                  r"(buildTypes\s*\{\s*release\s*\{)",
+                  r"\1\n\t\t\tsigningConfig signingConfigs.release",
+                  s, count=1,
+              )
           assert "signingConfig signingConfigs.release" in s
           open(p, "w", encoding="utf-8").write(s)
 
