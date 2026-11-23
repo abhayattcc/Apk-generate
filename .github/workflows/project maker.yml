@@ -1,4 +1,4 @@
-name: Build Project Maker APK (single file)
+name: Build Project Maker Debug APK
 
 on:
   push:
@@ -28,13 +28,10 @@ jobs:
           echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
           echo "sdk.dir=$ANDROID_HOME" > local.properties
           SDKM=$(ls "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager 2>/dev/null | head -n1 || true)
-          echo "sdkmanager: $SDKM"
           if [ -n "$SDKM" ]; then
             yes | "$SDKM" --licenses > /dev/null || true
             "$SDKM" "platforms;android-34" "build-tools;34.0.0" || true
           fi
-          ls "$ANDROID_HOME/platforms" || true
-          ls "$ANDROID_HOME/build-tools" || true
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -80,9 +77,6 @@ jobs:
               id 'com.android.application'
           }
 
-          def ksFile = rootProject.file('release.jks')
-          def useKs = ksFile.exists() && System.getenv('KEYSTORE_PASSWORD') != null
-
           android {
               namespace 'com.abhaya.projectmaker'
               compileSdk 34
@@ -93,25 +87,6 @@ jobs:
                   targetSdk 34
                   versionCode 1
                   versionName '1.0'
-              }
-
-              signingConfigs {
-                  release {
-                      if (useKs) {
-                          storeFile ksFile
-                          storePassword System.getenv('KEYSTORE_PASSWORD')
-                          keyAlias System.getenv('KEY_ALIAS')
-                          keyPassword System.getenv('KEYSTORE_PASSWORD')
-                          storeType 'pkcs12'
-                      }
-                  }
-              }
-
-              buildTypes {
-                  release {
-                      minifyEnabled false
-                      signingConfig useKs ? signingConfigs.release : signingConfigs.debug
-                  }
               }
 
               lint {
@@ -1071,13 +1046,6 @@ jobs:
                           "    id 'com.android.application'",
                           "}",
                           "",
-                          "def ksProps = new Properties()",
-                          "def ksFile = rootProject.file('keystore.properties')",
-                          "def hasKs = ksFile.exists() && rootProject.file('release.jks').exists()",
-                          "if (hasKs) {",
-                          "    ksFile.withInputStream { ksProps.load(it) }",
-                          "}",
-                          "",
                           "android {",
                           "    namespace '" + pkg + "'",
                           "    compileSdk 34",
@@ -1088,25 +1056,6 @@ jobs:
                           "        targetSdk 34",
                           "        versionCode 1",
                           "        versionName '1.0'",
-                          "    }",
-                          "",
-                          "    signingConfigs {",
-                          "        release {",
-                          "            if (hasKs) {",
-                          "                storeFile rootProject.file('release.jks')",
-                          "                storePassword ksProps['storePassword']",
-                          "                keyAlias ksProps['keyAlias']",
-                          "                keyPassword ksProps['keyPassword']",
-                          "                storeType 'pkcs12'",
-                          "            }",
-                          "        }",
-                          "    }",
-                          "",
-                          "    buildTypes {",
-                          "        release {",
-                          "            minifyEnabled false",
-                          "            signingConfig hasKs ? signingConfigs.release : signingConfigs.debug",
-                          "        }",
                           "    }",
                           "",
                           "    lint {",
@@ -1178,7 +1127,7 @@ jobs:
                           "    <style name='Theme.App' parent='Theme.MaterialComponents.DayNight.NoActionBar' />",
                           "</resources>"));
                   put(d, ".github/workflows/build.yml", j(
-                          "name: Build APK and AAB",
+                          "name: Build Debug APK",
                           "",
                           "on:",
                           "  push:",
@@ -1211,62 +1160,31 @@ jobs:
                           "        with:",
                           "          gradle-version: '8.9'",
                           "",
-                          "      - name: Decode keystore (optional secret)",
-                          "        env:",
-                          "          KEYSTORE_BASE64: $" + "{{ secrets.KEYSTORE_BASE64 }}",
-                          "          KEYSTORE_PASSWORD: $" + "{{ secrets.KEYSTORE_PASSWORD }}",
-                          "          KEY_ALIAS: $" + "{{ secrets.KEY_ALIAS }}",
-                          "        run: |",
-                          "          if [ -n \"$KEYSTORE_BASE64\" ]; then",
-                          "            echo \"$KEYSTORE_BASE64\" | base64 -d > release.jks",
-                          "            {",
-                          "              echo storeFile=release.jks",
-                          "              echo storePassword=$KEYSTORE_PASSWORD",
-                          "              echo keyAlias=$KEY_ALIAS",
-                          "              echo keyPassword=$KEYSTORE_PASSWORD",
-                          "            } > keystore.properties",
-                          "          fi",
-                          "",
-                          "      - name: Build",
-                          "        run: gradle --no-daemon assembleRelease bundleRelease",
+                          "      - name: Build debug APK",
+                          "        run: gradle --no-daemon assembleDebug",
                           "",
                           "      - uses: actions/upload-artifact@v4",
                           "        with:",
-                          "          name: apk",
-                          "          path: app/build/outputs/apk/release/*.apk",
-                          "",
-                          "      - uses: actions/upload-artifact@v4",
-                          "        with:",
-                          "          name: aab",
-                          "          path: app/build/outputs/bundle/release/*.aab"));
+                          "          name: debug-apk",
+                          "          path: app/build/outputs/apk/debug/*.apk"));
               }
           }
           JAVA_EOF
 
-      - name: Decode keystore (optional secret)
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-        run: |
-          if [ -n "$KEYSTORE_BASE64" ]; then
-            echo "$KEYSTORE_BASE64" | base64 -d > release.jks
-          fi
-
-      - name: Build APK
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-        run: gradle --no-daemon assembleRelease
+      - name: Build debug APK
+        run: gradle --no-daemon assembleDebug --stacktrace
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ProjectMaker-apk
-          path: app/build/outputs/apk/release/*.apk
+          name: ProjectMaker-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
 
       - name: Publish GitHub Release
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: v${{ github.run_number }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk ProjectMaker.apk
-          gh release create "$TAG" ProjectMaker.apk --title "Project Maker $TAG" --notes "Built automatically by GitHub Actions."
+          cp app/build/outputs/apk/debug/app-debug.apk ProjectMaker-debug.apk
+          gh release create "$TAG" ProjectMaker-debug.apk --title "Project Maker $TAG (debug)" --notes "Debug APK built automatically by GitHub Actions."
